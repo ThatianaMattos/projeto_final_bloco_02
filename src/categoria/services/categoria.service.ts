@@ -1,32 +1,61 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like, DeleteResult } from 'typeorm';
 import { Categoria } from '../entities/categoria.entity';
 
 @Injectable()
 export class CategoriaService {
   constructor(
     @InjectRepository(Categoria)
-    private categoriaRepository: Repository<Categoria>,
+    private readonly categoriaRepository: Repository<Categoria>,
   ) {}
 
-  findAll(): Promise<Categoria[]> {
-    return this.categoriaRepository.find();
+  async findAll(): Promise<Categoria[]> {
+    return this.categoriaRepository.find({
+      select: ['id', 'nome'],
+      relations: {
+        produtos: true,
+      },
+    });
   }
 
-  findById(id: number): Promise<Categoria | null> {
-    return this.categoriaRepository.findOneBy({ id });
+  async findById(id: number): Promise<Categoria> {
+    const categoria = await this.categoriaRepository.findOne({
+      where: { id },
+      relations: {
+        produtos: true,
+      },
+    });
+
+    if (!categoria) {
+      throw new NotFoundException('Categoria não encontrada');
+    }
+
+    return categoria;
   }
 
-  create(categoria: Categoria): Promise<Categoria> {
+  async findByNome(nome: string): Promise<Categoria[]> {
+    return this.categoriaRepository.find({
+      where: {
+        nome: Like(`%${nome}%`),
+      },
+      relations: {
+        produtos: true,
+      },
+    });
+  }
+
+  async create(categoria: Categoria): Promise<Categoria> {
     return this.categoriaRepository.save(categoria);
   }
 
-  update(categoria: Categoria): Promise<Categoria> {
+  async update(categoria: Categoria): Promise<Categoria> {
+    await this.findById(categoria.id);
     return this.categoriaRepository.save(categoria);
   }
 
-  async delete(id: number): Promise<void> {
-    await this.categoriaRepository.delete(id);
+  async delete(id: number): Promise<DeleteResult> {
+    await this.findById(id);
+    return this.categoriaRepository.delete(id);
   }
 }
