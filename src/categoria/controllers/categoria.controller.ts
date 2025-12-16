@@ -13,6 +13,8 @@ import {
 import { CategoriaService } from '../services/categoria.service';
 import { Categoria } from '../entities/categoria.entity';
 import { DeleteResult } from 'typeorm';
+import { CreateCategoriaDto } from '../dto/create-categoria.dto';
+import { UpdateCategoriaDto } from '../dto/update-categoria.dto';
 
 @Controller('/categorias')
 export class CategoriaController {
@@ -38,14 +40,14 @@ export class CategoriaController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() categoria: Categoria): Promise<Categoria> {
-    return this.categoriaService.create(categoria);
+  create(@Body() categoriaDto: CreateCategoriaDto): Promise<Categoria> {
+    return this.categoriaService.create(categoriaDto);
   }
 
   @Put()
   @HttpCode(HttpStatus.OK)
-  update(@Body() categoria: Categoria): Promise<Categoria> {
-    return this.categoriaService.update(categoria);
+  update(@Body() categoriaDto: UpdateCategoriaDto): Promise<Categoria> {
+    return this.categoriaService.update(categoriaDto);
   }
 
   @Delete('/:id')

@@ -4,6 +4,8 @@ import { Repository, Like, DeleteResult } from 'typeorm';
 
 import { Produto } from '../entities/produto.entity';
 import { CategoriaService } from '../../categoria/services/categoria.service';
+import { CreateProdutoDto } from '../dto/create-produto.dto';
+import { UpdateProdutoDto } from '../dto/update-produto.dto';
 
 @Injectable()
 export class ProdutoService {
@@ -43,23 +45,17 @@ export class ProdutoService {
     });
   }
 
-  async create(produto: Produto): Promise<Produto> {
-    // Valida se a categoria existe
-    await this.categoriaService.findById(produto.categoria.id);
+  async create(produtoDto: CreateProdutoDto): Promise<Produto> {
+    await this.categoriaService.findById(produtoDto.categoria.id);
 
-    return this.produtoRepository.save(produto);
+    return this.produtoRepository.save(produtoDto);
   }
+  async update(produtoDto: UpdateProdutoDto): Promise<Produto> {
+    await this.findById(produtoDto.id);
+    await this.categoriaService.findById(produtoDto.categoria.id);
 
-  async update(produto: Produto): Promise<Produto> {
-    // Valida se o produto existe
-    await this.findById(produto.id);
-
-    // Valida se a categoria existe
-    await this.categoriaService.findById(produto.categoria.id);
-
-    return this.produtoRepository.save(produto);
+    return this.produtoRepository.save(produtoDto);
   }
-
   async delete(id: number): Promise<DeleteResult> {
     await this.findById(id);
     return this.produtoRepository.delete(id);

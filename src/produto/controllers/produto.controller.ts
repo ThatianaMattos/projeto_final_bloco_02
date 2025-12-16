@@ -14,6 +14,8 @@ import {
 import { Produto } from '../entities/produto.entity';
 import { ProdutoService } from '../services/produto.service';
 import { DeleteResult } from 'typeorm';
+import { CreateProdutoDto } from '../dto/create-produto.dto';
+import { UpdateProdutoDto } from '../dto/update-produto.dto';
 
 @Controller('/produtos')
 export class ProdutoController {
@@ -39,14 +41,14 @@ export class ProdutoController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() produto: Produto): Promise<Produto> {
-    return this.produtoService.create(produto);
+  create(@Body() produtoDto: CreateProdutoDto): Promise<Produto> {
+    return this.produtoService.create(produtoDto);
   }
 
   @Put()
   @HttpCode(HttpStatus.OK)
-  update(@Body() produto: Produto): Promise<Produto> {
-    return this.produtoService.update(produto);
+  update(@Body() produtoDto: UpdateProdutoDto): Promise<Produto> {
+    return this.produtoService.update(produtoDto);
   }
 
   @Delete('/:id')
